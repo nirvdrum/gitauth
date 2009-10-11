@@ -30,7 +30,7 @@ module GitAuth
     
     def self.create(name, path = name)
       return false if name.nil? || path.nil?
-      return false if self.get(name) || self.all.any? { |r| r.path == path } || name !~ NAME_RE || path !~ NAME_RE
+      return false if self.get(name) || self.all.any? { |r| r.path == path } || name !~ NAME_RE
       repository = new(name, path)
       return false unless repository.create_repo!
       add_item(repository)
