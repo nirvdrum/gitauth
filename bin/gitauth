@@ -83,7 +83,7 @@ GitAuth::Application.processing(ARGV) do |a|
   
   a.option(:force, "Skip the verification / confirmation part of adding the permissions")
   a.option(:type, "The type of permissions - one of all, read, write or none. Defaults to all")
-  full_desc = "Gives a specific user or group the specified permissions to a given repository"
+  full_desc = "Gives a specific user or group the specified permissions to a given repository -- use 'ALL' to indicate all repositories"
   a.add("permissions REPOSITORY USER-OR-GROUP", full_desc) do |repo, target, options|
     GitAuth.prepare
     permissions = options[:type] || 'all'
@@ -96,14 +96,17 @@ GitAuth::Application.processing(ARGV) do |a|
     repository       = GitAuth::Repo.get(repo)
     real_target      = GitAuth.get_user_or_group(target)
     
-    die! "Unknown repository '#{repo}'"      if repository.blank?
+    die! "Unknown repository '#{repo}'"      if repository.blank? && repo != 'ALL'
     die! "Unknown user or group '#{target}'" if real_target.blank?
-    
-    if options[:force] || yes?("Adding '#{permissions}' permissions for #{real_target} to #{repository.name}")
-      repository.update_permissions!(real_target, real_permissions)
-      puts "Permissions updated."
-    else
-      puts "Permissions not added, exiting."
+   
+    repositories = repository.blank? ? GitAuth::Repo.all : [repository]
+    repositories.each do |r|
+      if options[:force] || yes?("Adding '#{permissions}' permissions for #{real_target} to #{r.name}")
+        r.update_permissions!(real_target, real_permissions)
+        puts "Permissions updated."
+      else
+        puts "Permissions not added, exiting."
+      end
     end
   end
     
