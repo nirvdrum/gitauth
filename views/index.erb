@@ -25,7 +25,7 @@
     <% @repos.each do |r| %>
       <li>
         <span class="tag repo">repo</span>
-        <%= h(r.name) %> -
+        <%= h(r.path) %> -
         <%= link_to "view", "/repos/#{URI.encode(r.name)}" %> or
         <%= delete_link "remove", "/repos/#{URI.encode(r.name)}" %>
       </li>
